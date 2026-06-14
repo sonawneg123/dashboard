@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}{{ user.name }} — NexusDB{% endblock %}
+{% block breadcrumb %}
+  <a class="bc-item bc-link" href="{{ url_for('users.index') }}">Dashboard</a>
+  <span class="bc-sep">›</span>
+  <span class="bc-item bc-active">{{ user.name }}</span>
+{% endblock %}
+
+{% block content %}
+<div class="detail-layout">
+
+  <!-- Left: Profile card -->
+  <div class="profile-card">
+    <div class="profile-avatar avatar--{{ user.role }} avatar--xl">{{ user.name[0].upper() }}</div>
+    <h2 class="profile-name">{{ user.name }}</h2>
+    <p class="profile-email">{{ user.email }}</p>
+    <div class="profile-badges">
+      <span class="badge badge--{{ user.role }}">{{ user.role }}</span>
+      <span class="badge badge--status-{{ user.status }}">{{ user.status }}</span>
+    </div>
+
+    <div class="profile-meta">
+      <div class="meta-row">
+        <span class="meta-key">ID</span>
+        <span class="meta-val">#{{ user.id }}</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-key">Phone</span>
+        <span class="meta-val">{{ user.phone or '—' }}</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-key">Joined</span>
+        <span class="meta-val">{{ user.created_at.strftime('%Y-%m-%d') if user.created_at else '—' }}</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-key">Updated</span>
+        <span class="meta-val">{{ user.updated_at.strftime('%Y-%m-%d %H:%M') if user.updated_at else '—' }}</span>
+      </div>
+    </div>
+
+    <div class="profile-actions">
+      <a class="btn btn-primary btn-full" href="{{ url_for('users.edit_user', uid=user.id) }}">Edit User</a>
+      <button class="btn btn-danger btn-full" onclick="confirmDelete({{ user.id }}, '{{ user.name | e }}')">Delete</button>
+    </div>
+  </div>
+
+  <!-- Right: Audit log -->
+  <div class="audit-panel">
+    <div class="audit-header">
+      <h3 class="audit-title">Activity Log</h3>
+      <span class="audit-count">{{ logs|length }} events</span>
+    </div>
+
+    {% if logs %}
+    <ul class="audit-list">
+      {% for log in logs %}
+      <li class="audit-item audit-item--{{ log.action.lower() }}">
+        <div class="audit-dot"></div>
+        <div class="audit-content">
+          <span class="audit-action">{{ log.action }}</span>
+          <span class="audit-ts">{{ log.created_at.strftime('%Y-%m-%d %H:%M:%S') if log.created_at else '—' }}</span>
+          {% if log.ip_address %}
+          <span class="audit-ip">from {{ log.ip_address }}</span>
+          {% endif %}
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="audit-empty">No activity recorded yet.</div>
+    {% endif %}
+  </div>
+
+</div>
+
+<script>
+function confirmDelete(uid, name) {
+  document.getElementById('modal-body').textContent = `"${name}" will be permanently removed from the database.`;
+  document.getElementById('modal-form').action = `/users/${uid}/delete`;
+  openModal();
+}
+</script>
+{% endblock %}

@@ -1,0 +1,45 @@
+# ================================================================
+#  NexusDB Backend — systemd Service Unit
+#  Install: sudo cp nexusdb.service /etc/systemd/system/
+#           sudo systemctl daemon-reload
+#           sudo systemctl enable --now nexusdb
+# ================================================================
+
+[Unit]
+Description=NexusDB Flask Backend (Gunicorn)
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=notify
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/nexusdb/backend
+
+EnvironmentFile=/opt/nexusdb/backend/.env
+
+ExecStartPre=/opt/nexusdb/venv/bin/flask db upgrade
+ExecStart=/opt/nexusdb/venv/bin/gunicorn \
+    -c /opt/nexusdb/backend/gunicorn.conf.py \
+    app:app
+
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s TERM $MAINPID
+
+Restart=on-failure
+RestartSec=5s
+TimeoutStopSec=30
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=nexusdb
+
+# Security hardening
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ReadWritePaths=/var/log/gunicorn /opt/nexusdb/backend
+
+[Install]
+WantedBy=multi-user.target

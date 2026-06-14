@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Edit {{ user.name }} — NexusDB{% endblock %}
+{% block breadcrumb %}
+  <a class="bc-item bc-link" href="{{ url_for('users.index') }}">Dashboard</a>
+  <span class="bc-sep">›</span>
+  <a class="bc-item bc-link" href="{{ url_for('users.view_user', uid=user.id) }}">{{ user.name }}</a>
+  <span class="bc-sep">›</span>
+  <span class="bc-item bc-active">Edit</span>
+{% endblock %}
+
+{% block content %}
+<div class="form-page">
+  <div class="form-card">
+    <div class="form-card-header">
+      <div class="form-card-icon form-card-icon--edit">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </div>
+      <div>
+        <h1 class="form-card-title">Edit User</h1>
+        <p class="form-card-sub">ID #{{ user.id }} · Last updated {{ user.updated_at.strftime('%Y-%m-%d %H:%M') if user.updated_at else 'never' }}</p>
+      </div>
+    </div>
+
+    <form class="form" method="POST" action="{{ url_for('users.edit_user', uid=user.id) }}" novalidate>
+      <div class="form-row">
+        <div class="field">
+          <label class="label" for="name">Full Name <span class="req">*</span></label>
+          <input class="input" id="name" name="name" type="text" value="{{ user.name }}" required/>
+        </div>
+        <div class="field">
+          <label class="label" for="email">Email Address <span class="req">*</span></label>
+          <input class="input" id="email" name="email" type="email" value="{{ user.email }}" required/>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label class="label" for="phone">Phone</label>
+          <input class="input" id="phone" name="phone" type="tel" value="{{ user.phone or '' }}"/>
+        </div>
+        <div class="field">
+          <label class="label" for="role">Role <span class="req">*</span></label>
+          <select class="input" id="role" name="role">
+            <option value="viewer" {% if user.role=='viewer' %}selected{% endif %}>Viewer</option>
+            <option value="editor" {% if user.role=='editor' %}selected{% endif %}>Editor</option>
+            <option value="admin"  {% if user.role=='admin'  %}selected{% endif %}>Admin</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label class="label" for="status">Status</label>
+          <select class="input" id="status" name="status">
+            <option value="active"   {% if user.status=='active'   %}selected{% endif %}>Active</option>
+            <option value="inactive" {% if user.status=='inactive' %}selected{% endif %}>Inactive</option>
+            <option value="banned"   {% if user.status=='banned'   %}selected{% endif %}>Banned</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <a class="btn btn-ghost" href="{{ url_for('users.index') }}">Cancel</a>
+        <button class="btn btn-primary" type="submit">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Update User
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

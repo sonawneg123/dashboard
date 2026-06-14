@@ -1,0 +1,8 @@
+# NexusDB Backend — Python Dependencies
+flask>=3.0.0
+flask-sqlalchemy>=3.1.0
+flask-migrate>=4.0.0
+pymysql>=1.1.0
+cryptography>=42.0.0       # required by pymysql for SSL
+gunicorn>=22.0.0
+python-dotenv>=1.0.0

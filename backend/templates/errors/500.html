@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}500 — NexusDB{% endblock %}
+{% block content %}
+<div class="error-page">
+  <div class="error-code error-code--500">500</div>
+  <h1 class="error-title">Internal Server Error</h1>
+  <p class="error-sub">Something went wrong on our end. Check the server logs.</p>
+  <a class="btn btn-primary" href="{{ url_for('users.index') }}">Back to Dashboard</a>
+</div>
+{% endblock %}

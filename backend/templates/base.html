@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>{% block title %}NexusDB{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}"/>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+  <!-- ── Mesh background ── -->
+  <div class="mesh-bg" aria-hidden="true">
+    <div class="mesh-blob mesh-blob--1"></div>
+    <div class="mesh-blob mesh-blob--2"></div>
+    <div class="mesh-blob mesh-blob--3"></div>
+    <div class="mesh-grid"></div>
+  </div>
+
+  <!-- ── Sidebar ── -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="brand">
+        <span class="brand-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span class="brand-name">NexusDB</span>
+        <span class="brand-badge">v2</span>
+      </div>
+      <button class="sidebar-close" id="sidebar-close" aria-label="Close sidebar">✕</button>
+    </div>
+
+    <div class="sidebar-section-label">Main</div>
+    <ul class="nav-list">
+      <li><a class="nav-link {% if request.endpoint == 'users.index' %}active{% endif %}" href="{{ url_for('users.index') }}">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </a></li>
+      <li><a class="nav-link {% if request.endpoint == 'users.create_user' %}active{% endif %}" href="{{ url_for('users.create_user') }}">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><path d="M19 10v6M16 13h6" stroke-width="2" stroke-linecap="round"/></svg>
+        Add User
+      </a></li>
+    </ul>
+
+    <div class="sidebar-section-label">System</div>
+    <ul class="nav-list">
+      <li><a class="nav-link" href="/health" target="_blank">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        Health Check
+      </a></li>
+      <li><a class="nav-link" href="/api/v1/stats" target="_blank">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        API Stats
+      </a></li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <div class="infra-badge">
+        <span class="infra-dot"></span>
+        <span class="infra-text">MySQL RDS · Connected</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── Main content ── -->
+  <div class="layout-body">
+    <!-- Topbar -->
+    <header class="topbar">
+      <button class="topbar-hamburger" id="topbar-hamburger" aria-label="Open sidebar">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="topbar-breadcrumb">{% block breadcrumb %}Dashboard{% endblock %}</div>
+      <div class="topbar-actions">
+        <a href="{{ url_for('users.create_user') }}" class="btn btn-primary btn-sm">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New User
+        </a>
+      </div>
+    </header>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-region">
+          {% for cat, msg in messages %}
+          <div class="flash flash--{{ cat }}" role="alert">
+            <span class="flash-icon">{% if cat == 'success' %}✓{% else %}⚠{% endif %}</span>
+            <span class="flash-msg">{{ msg }}</span>
+            <button class="flash-dismiss" onclick="this.parentElement.remove()" aria-label="Dismiss">✕</button>
+          </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Page content -->
+    <main class="page-main">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+
+  <!-- ── Modal overlay ── -->
+  <div class="modal-backdrop" id="modal-backdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-icon" id="modal-icon">🗑</div>
+      <h3 class="modal-title" id="modal-title">Confirm Delete</h3>
+      <p class="modal-body" id="modal-body">This cannot be undone.</p>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+        <form id="modal-form" method="POST" action="">
+          <button class="btn btn-danger" type="submit">Delete</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Toast ── -->
+  <div class="toast-region" id="toast-region" aria-live="polite"></div>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

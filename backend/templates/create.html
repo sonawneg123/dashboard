@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Add User — NexusDB{% endblock %}
+{% block breadcrumb %}
+  <a class="bc-item bc-link" href="{{ url_for('users.index') }}">Dashboard</a>
+  <span class="bc-sep">›</span>
+  <span class="bc-item bc-active">Add User</span>
+{% endblock %}
+
+{% block content %}
+<div class="form-page">
+  <div class="form-card">
+    <div class="form-card-header">
+      <div class="form-card-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><path d="M19 10v6M16 13h6" stroke-linecap="round"/></svg>
+      </div>
+      <div>
+        <h1 class="form-card-title">Add New User</h1>
+        <p class="form-card-sub">Fill in the details below to register a user in MySQL RDS.</p>
+      </div>
+    </div>
+
+    <form class="form" method="POST" action="{{ url_for('users.create_user') }}" novalidate>
+      <div class="form-row">
+        <div class="field">
+          <label class="label" for="name">Full Name <span class="req">*</span></label>
+          <input class="input" id="name" name="name" type="text" placeholder="Jane Doe" required autocomplete="off"/>
+        </div>
+        <div class="field">
+          <label class="label" for="email">Email Address <span class="req">*</span></label>
+          <input class="input" id="email" name="email" type="email" placeholder="jane@company.com" required autocomplete="off"/>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label class="label" for="phone">Phone</label>
+          <input class="input" id="phone" name="phone" type="tel" placeholder="+1-555-0100" autocomplete="off"/>
+        </div>
+        <div class="field">
+          <label class="label" for="role">Role <span class="req">*</span></label>
+          <select class="input" id="role" name="role">
+            <option value="viewer">Viewer</option>
+            <option value="editor">Editor</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label class="label" for="status">Status</label>
+          <select class="input" id="status" name="status">
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+            <option value="banned">Banned</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <a class="btn btn-ghost" href="{{ url_for('users.index') }}">Cancel</a>
+        <button class="btn btn-primary" type="submit">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Save User
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
