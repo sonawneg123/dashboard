@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UserVault — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+
+  <!-- ── Background orbs ── -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- ── Header ── -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">⬡</span>
+        <span class="logo-text">UserVault</span>
+      </div>
+      <div class="header-badge">
+        <span class="dot"></span>
+        <span>{{ users|length }} registered</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- ── Flash messages ── -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-wrap">
+          {% for category, message in messages %}
+            <div class="flash flash--{{ category }}">
+              <span class="flash-icon">{{ '✓' if category == 'success' else '⚠' }}</span>
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- ── Two-column layout ── -->
+    <div class="layout">
+
+      <!-- ── Left: Registration card ── -->
+      <aside class="panel panel-register">
+        <div class="panel-header">
+          <h2 class="panel-title">Register</h2>
+          <p class="panel-sub">Add yourself to the vault</p>
+        </div>
+
+        <form action="/register" method="POST" class="form" id="reg-form">
+          <div class="field">
+            <label class="label" for="name">Full Name</label>
+            <div class="input-wrap">
+              <span class="input-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+              </span>
+              <input class="input" id="name" name="name" type="text" placeholder="Jane Doe" required autocomplete="off" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label" for="email">Email</label>
+            <div class="input-wrap">
+              <span class="input-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg>
+              </span>
+              <input class="input" id="email" name="email" type="email" placeholder="jane@example.com" required autocomplete="off" />
+            </div>
+          </div>
+
+          <button class="btn-primary" type="submit">
+            <span class="btn-text">Register Now</span>
+            <span class="btn-arrow">→</span>
+          </button>
+        </form>
+
+        <!-- Stats -->
+        <div class="stats">
+          <div class="stat">
+            <span class="stat-value" id="total-count">{{ users|length }}</span>
+            <span class="stat-label">Total Users</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat">
+            <span class="stat-value">SQL</span>
+            <span class="stat-label">Powered</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat">
+            <span class="stat-value">Flask</span>
+            <span class="stat-label">Backend</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ── Right: Users table ── -->
+      <section class="panel panel-table">
+        <div class="panel-header panel-header-row">
+          <div>
+            <h2 class="panel-title">Users</h2>
+            <p class="panel-sub">Manage registered accounts</p>
+          </div>
+          <div class="search-wrap">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+            <input class="search-input" id="search" type="text" placeholder="Filter users…" />
+          </div>
+        </div>
+
+        {% if users %}
+        <div class="table-wrap">
+          <table class="table" id="users-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Joined</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for user in users %}
+              <tr data-id="{{ user.id }}" class="user-row">
+                <td class="td-id">{{ user.id }}</td>
+                <td class="td-name">
+                  <div class="avatar">{{ user.name[0].upper() }}</div>
+                  <span>{{ user.name }}</span>
+                </td>
+                <td class="td-email">{{ user.email }}</td>
+                <td class="td-date">{{ user.created_at[:10] }}</td>
+                <td class="td-action">
+                  <button class="btn-delete" onclick="deleteUser({{ user.id }}, this)" title="Delete user">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                  </button>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+          <div class="empty-icon">👤</div>
+          <p class="empty-title">No users yet</p>
+          <p class="empty-sub">Register the first user using the form.</p>
+        </div>
+        {% endif %}
+      </section>
+
+    </div><!-- /layout -->
+  </main>
+
+  <!-- ── Delete confirm modal ── -->
+  <div class="modal-backdrop" id="modal-backdrop">
+    <div class="modal">
+      <div class="modal-icon">🗑</div>
+      <h3 class="modal-title">Delete user?</h3>
+      <p class="modal-body" id="modal-body">This action cannot be undone.</p>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn-confirm" id="modal-confirm">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Toast ── -->
+  <div class="toast" id="toast"></div>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
