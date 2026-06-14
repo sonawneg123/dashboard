@@ -2,7 +2,7 @@
 --  User Dashboard - Database Schema
 --  Database: SQLite (compatible with MySQL/PostgreSQL with minor changes)
 -- ============================================================
-
+CREATE DATABASE dev;
 -- Drop table if it already exists (for fresh setup)
 DROP TABLE IF EXISTS users;
 
